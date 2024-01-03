@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Search Engine</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+h1 {
+    color: #000;
+    font-size: 66px;
+      font-weight: bold;
+      letter-spacing: 4px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+    background-image: url('{{ url_for('static', filename='image/bcg3.jpg') }}');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+
+}
+
+form {
+    margin-top: 20px;
+    border-radius: 15px;
+    border-bottom-left-radius: 0px;
+    background-color: black;
+    display: inline-block;
+}
+
+input[type="text"] {
+    padding: 23px 20px 20px 23px;
+    font-size: 16px;
+    border: none;
+    margin: 6px 6px 6px 6px ;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    background-color: black;
+    color: white;
+}
+
+input[type="submit"] {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin: 6px 6px 6px 6px ;
+    background-color: white;
+    color: black;
+    border: none;
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    cursor: pointer;
+}
+
+h2 {
+    margin-top: 20px;
+    color: #fff;
+}
+
+.result-box {
+    border: 2px solid #ddd;
+    padding: 20px;
+    margin: 20px 40px 40px;
+    background: linear-gradient(to right, rgba(255, 255, 255,0.04),rgba(39, 24, 31  ,0.4), rgba(211, 199, 204 ,0.3));
+    box-shadow: 0 0 5px 0 ;
+    backdrop-filter: blur(10px);
+}
+
+.movie-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.movie-details {
+    flex: 1;
+    text-align: left;
+    margin-left: 20px;
+}
+#suggestions {
+        position: absolute;
+        width: 100%;
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: hidden;
+        text-overflow: ellipsis;
+    background: #000000;);
+
+    }
+
+    .dropdown-item {
+     cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding: 5px;
+        color: #ffffff;
+    }
+.movie-name {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.overview {
+    font-size: 16px;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.file-link {
+    font-size: 14px;
+    color: #ffffff;
+}
+
+.poster {
+    max-width: 100px;
+    max-height: 150px;
+    border-radius: 10px;
+}
+        .filter-buttons {
+<!--        display: flex;-->
+        justify-content: center;
+        margin-top: 0px;
+    background: none;
+    }
+
+    .filter-button {
+        color: #fff;
+        padding: 10px 20px;
+    background: #000000;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .filter-button:hover {
+        filter: brightness(1.2);
+    }
+        .time
+        {
+        width: 300px;
+        margin-left: 470px;
+        background: #C70039;
+        }
+        .whole
+        {
+        backdrop-filter: blur(5.5px);
+        }
+         a {
+      color: #C70039;
+    }
+
+    a:hover {
+      color: #fff;
+    }
+</style>
+</head>
+<body>
+<div class="whole">
+        <h1>CineMatch</h1>
+<h2>A Movie Information Retrieval System</h2>
+        <form action="/search" method="post">
+    <div class="form-row">
+        <div class="col-8">
+            <input type="text" class="form-control" id="search_query" name="search_query" placeholder="Search for movies">
+            <div id="suggestions" class="dropdown"></div>
+        </div>
+        <div class="col-4">
+            <input type="submit" value="Search">
+        </div>
+    </div>
+</form>
+{% if search_results %}
+            <h2>Search Results:</h2>
+            <div class="time"><p>Results generated in {{ search_time_us }} ms.</p></div>
+<div class="filter-buttons">
+    <form action="/search" method="post">
+        <input type="hidden" name="search_query" value="{{ request.form.get('search_query') }}">
+        <button type="submit" name="sort_option" value="ratings" class="filter-button">Sort by Ratings</button>
+    </form>
+
+    <form action="/search" method="post">
+        <input type="hidden" name="search_query" value="{{ request.form.get('search_query') }}">
+        <button type="submit" name="sort_option" value="runtime" class="filter-button">Sort by Runtime</button>
+    </form>
+</div>
+        </div>
+        <div id="search_results">
+
+            <form action="/search" method="post">
+        <input type="hidden" name="search_query" value="{{ request.form.get('search_query') }}">
+                </form>
+            {% for result in search_results %}
+                <div class="result-box">
+                    <div class="movie-info">
+                        <img class="poster" src="{{ result.img }}" alt="Movie Poster">
+                        <div class="movie-details">
+                            <div class="movie-name">{{ result.title }}</div>
+                            <div class="overview">{{ result.overview }}</div>
+<!--                            <div class="file-link"><a href="{{ result.filename }}" target="_blank">{{ result.filename }}</a></div>-->
+<a href="{{ url_for('info_page', title=result['title'], filename=result['filename']) }}" onclick="fetchAndShowCurrentMovieInfo('{{ result['title'] }}', '{{ result['filename'] }}')">{{ result['filename'] }}</a></div>
+
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            {% else %}
+    <p>No results found</p>
+        {% endif %}
+    </div>
+<!--    </div>/-->
+<script>
+    $(document).ready(function () {
+        $("#search_query").on("input", function () {
+            var query = $(this).val();
+            console.log("Query:", query);
+            if (query.length >= 2) {
+                $.ajax({
+                    type: "GET",
+                    url: "/suggest?q=" + query,
+                    success: function (data) {
+                        console.log("Suggestions:", data);
+                        displaySuggestions(data);
+                    },
+                    error: function (error) {
+                        console.error("Error fetching suggestions:", error);
+                    }
+                });
+            } else {
+                $("#suggestions").empty().hide();
+            }
+        });
+
+        function displaySuggestions(suggestions) {
+            var dropdown = $("#suggestions");
+            dropdown.empty();
+
+            if (suggestions.length > 0) {
+                suggestions.forEach(function (suggestion) {
+                    var item = $("<div class='dropdown-item'>" + suggestion + "</div>");
+                    item.click(function () {
+                        $("#search_query").val(suggestion);
+                        $("#suggestions").empty().hide();
+                    });
+                    dropdown.append(item);
+                });
+                dropdown.show();
+            } else {
+                dropdown.hide();
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

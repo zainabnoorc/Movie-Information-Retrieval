@@ -1,0 +1,274 @@
+<!-- templates/info_page.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info Page</title>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            overflow: hidden;
+            background-image: url('{{ url_for('static', filename='image/bcg3.jpg') }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+h1{
+margin-left: 75px;
+color: #fff
+}
+        .drawer {
+            height: 100%;
+            width: 210px;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background: linear-gradient(to bottom, rgba(6, 76, 102 ,1),rgba(51, 118, 144 ,1), rgba(21, 96, 124 ,0.6));
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            margin: 20px;
+        }
+
+        .drawer a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #30242B;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .drawer a:hover {
+            color: #f1f1f1;
+        }
+
+        .drawer .close {
+            font-size: 36px;
+            margin-right: 50px;
+            margin-top: 20px;
+            color: #818181;
+            cursor: pointer;
+        }
+
+        .content {
+            box-sizing: border-box;
+            transition: margin-left 0.5s;
+            overflow-y: auto;
+
+        }
+
+ .movie-info {
+<!--            background: linear-gradient(to right, rgba(255, 255, 255,0.2),rgba(231, 242, 247 ,0.3), rgba(231, 242, 247 ,0.2));-->
+    box-shadow: 0 0 5px 0 ;
+    backdrop-filter: blur(5.5px);
+max-height: 500px;
+        overflow-y: auto;
+<!--margin-top: 10px;-->
+        }
+.info{
+display: flex;
+margin-bottom: 15px;
+}
+        .movie-details {
+        width: 50%;
+        margin-top: 25px;
+        margin-left: 70px;
+        margin-bottom: 15px;
+    flex: 2;
+}
+.movie-details p {
+color: #fff;
+    margin-bottom: 10px;
+    margin-left: 80px;
+}
+
+.movie-image {
+width: 50%;
+flex: 1;
+    margin-left: 10px;
+    margin-top: 40px;
+}
+
+.movie-image img {
+    max-width: 100%;
+    height: 330px;
+}
+        .tag{
+        height: 20px;
+        color: #000;
+        margin-left: 100px;
+        margin-right: 110px;
+        background: #C70039;
+        }
+        span{
+        margin-left: 40px;
+        color: #fff;
+        }
+         .genre-container {
+            margin-top: 40px;
+            margin-left:50px;
+            margin-right: 50px;
+            border-bottom: 2px solid red;
+            color: #fff;
+        }
+
+        .genre-heading {
+            font-size: 28px;
+            margin-bottom: 10px;
+            margin-top: 10px;
+            color: #fff;
+        }
+
+        .movies {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .movie {
+            margin: 30px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .movie img {
+            max-width: 150px;
+            max-height: 200px;
+            border-radius: 8px;
+            margin-left: 10px;
+            margin-right:10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .movie p {
+            margin-top: 5px;
+            max-width: 150px;
+            font-size: 14px;
+        }
+        #movieGenresContainer {
+            background: #071e26;
+    }
+        .whole
+        {
+justify-content: center;
+      align-items: center;
+        color: #000;
+    font-size: 18px;
+    height: 100%;
+    margin-top:-23px;
+      font-weight: bold;
+      letter-spacing: 4px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      background: #000000;
+        }
+    </style>
+</head>
+<body>
+<div class="whole">
+
+        <h1>CineMatch</h1>
+    </div>
+ <div class="drawer" id="myDrawer">
+        <a href="javascript:void(0)" class="close" onclick="closeDrawer()">&times;</a>
+        <a href="javascript:void(0)" onclick="showCurrentMovieInfo()">Current Movie</a>
+     <!-- Corrected link in info_page.html -->
+<a href="{{ url_for('download_summary') }}" download>Download Summary</a>
+     <a href="{{ url_for('download_file') }}" download>Download Full File</a>
+    </div>
+    <div class="content">
+    <div id="currentMovieInfo" class="movie-info" style="display:none;">
+        <div class="info">
+
+<div class="movie-details">
+    <span style="font-size:30px;cursor:pointer" onclick="openDrawer()">&#9776;</span>
+        <h1 id="movieTitle"></h1>
+    <div class="tag" >
+    <p id="movieTagline" style="color: #000000"></p>
+        </div>
+        <p id="movieOverview"></p>
+        <p id="movieRating"></p>
+        <p id="movieHomepage"></p>
+        <p id="moviePopularity" ></p>
+
+        <p id="movieRuntime"></p>
+    </div>
+    <div class="movie-image">
+        <img class="poster" src="{{ current_movie_info.img }}" alt="Movie Poster">
+    </div>
+
+</div>
+        <div id="movieGenresContainer">
+    <div id="movieGenres"></div>
+</div>
+    </div>
+    </div>
+    <script>
+        function openDrawer() {
+            document.getElementById("myDrawer").style.width = "210px";
+            document.getElementById("myDrawer").style.marginLeft = "20px";
+            document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
+        }
+
+        function closeDrawer() {
+            document.getElementById("myDrawer").style.width = "0";
+            document.getElementById("myDrawer").style.marginLeft = "-250px";
+            document.body.style.backgroundColor = "#f0f0f0";
+        }
+        function showCurrentMovieInfo() {
+        var currentMovieInfo = {{ current_movie_info|tojson|safe }};
+        var moviegenres = {{ movie_genres|tojson|safe }};
+        document.getElementById("movieTitle").innerText = currentMovieInfo.title;
+        document.getElementById("movieOverview").innerText = currentMovieInfo.overview;
+        document.getElementById("movieRating").innerText = "Rating: " + currentMovieInfo.rating;
+        document.getElementById("movieHomepage").innerText = "Homepage: " + currentMovieInfo.homepage;
+        document.getElementById("moviePopularity").innerText = "Popularity: " + currentMovieInfo.popularity;
+        document.getElementById("movieTagline").innerText = "Tagline: " + currentMovieInfo.tagline;
+        document.getElementById("movieRuntime").innerText = "Runtime: " + currentMovieInfo.runtime;
+        document.getElementById("currentMovieInfo").style.display = "block";
+
+    }
+function showMovieGenres(movieGenres) {
+            var hrElement = document.createElement("hr");
+            hrElement.className = "red-line"; // Apply the red line styles
+            document.body.appendChild(hrElement);
+            for (const [genre, movies] of Object.entries(movieGenres)) {
+                const genreContainer = document.createElement('div');
+                genreContainer.className = 'genre-container';
+                const genreHeading = document.createElement('h2');
+                genreHeading.textContent = genre;
+
+                const moviesContainer = document.createElement('div');
+                moviesContainer.className = 'movies';
+
+                for (const movie of movies) {
+                    const movieDiv = document.createElement('div');
+                    movieDiv.className = 'movie';
+
+                    const img = document.createElement('img');
+                    img.src = movie.poster_path;
+                    img.alt = movie.title;
+
+                    const p = document.createElement('p');
+                    p.textContent = movie.title;
+
+                    movieDiv.appendChild(img);
+                    movieDiv.appendChild(p);
+                    moviesContainer.appendChild(movieDiv);
+                }
+
+                genreContainer.appendChild(genreHeading);
+                genreContainer.appendChild(moviesContainer);
+
+                document.getElementById('movieGenres').appendChild(genreContainer);
+            }
+        }
+
+        const movieGenresData = {{ movie_genres|tojson|safe }};
+        showMovieGenres(movieGenresData);
+    </script>
+</body>
+</html>
